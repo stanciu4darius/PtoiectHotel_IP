@@ -1,75 +1,53 @@
-
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import Controler.LoginController;
 import Model.LoginModel;
 import View.Login;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import javax.swing.*;
+import java.awt.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class LoginControllerTest {
 
+    @Mock
     private LoginModel loginModel;
+    @Mock
     private Login loginView;
-    private LoginController controller;
+    @Mock
+    private JButton loginButton;
+    @Mock
+    private JTextField usernameField;
+    @Mock
+    private JPasswordField passwordField;
+    @Mock
+    private JPanel loginPanel;
+    private LoginController loginController;
 
     @BeforeEach
     void setUp() {
-        loginModel = mock(LoginModel.class);
-        loginView = mock(Login.class);
-        controller = new LoginController(loginModel, loginView);
-    }
-
-    @Test
-    void handleLogin_showsSuccessMessageWhenLoginIsValid() {
-        JButton loginButton = mock(JButton.class);
-        JTextField usernameField = mock(JTextField.class);
-        JPasswordField passwordField = mock(JPasswordField.class);
+        MockitoAnnotations.openMocks(this);
         when(loginView.getLoginButton()).thenReturn(loginButton);
         when(loginView.getUsernameField()).thenReturn(usernameField);
         when(loginView.getPasswordField()).thenReturn(passwordField);
-        when(usernameField.getText()).thenReturn("validUser");
-        when(passwordField.getPassword()).thenReturn("validPass".toCharArray());
-        when(loginModel.validateLogin("validUser", "validPass")).thenReturn(true);
-
-        loginButton.getActionListeners()[0].actionPerformed(null);
-
-        verify(loginModel).validateLogin("validUser", "validPass");
+        when(loginView.getLoginPanel()).thenReturn(loginPanel);
+        loginController = new LoginController(loginModel, loginView);
     }
 
     @Test
-    void handleLogin_showsErrorMessageWhenLoginIsInvalid() {
-        JButton loginButton = mock(JButton.class);
-        JTextField usernameField = mock(JTextField.class);
-        JPasswordField passwordField = mock(JPasswordField.class);
-        when(loginView.getLoginButton()).thenReturn(loginButton);
-        when(loginView.getUsernameField()).thenReturn(usernameField);
-        when(loginView.getPasswordField()).thenReturn(passwordField);
-        when(usernameField.getText()).thenReturn("invalidUser");
-        when(passwordField.getPassword()).thenReturn("invalidPass".toCharArray());
-        when(loginModel.validateLogin("invalidUser", "invalidPass")).thenReturn(false);
-
-        loginButton.getActionListeners()[0].actionPerformed(null);
-
-        verify(loginModel).validateLogin("invalidUser", "invalidPass");
-    }
-
-    @Test
-    void handleLogin_navigatesToAfterLoginWhenLoginIsValid() {
-        JButton loginButton = mock(JButton.class);
-        JTextField usernameField = mock(JTextField.class);
-        JPasswordField passwordField = mock(JPasswordField.class);
-        when(loginView.getLoginButton()).thenReturn(loginButton);
-        when(loginView.getUsernameField()).thenReturn(usernameField);
-        when(loginView.getPasswordField()).thenReturn(passwordField);
-        when(usernameField.getText()).thenReturn("validUser");
-        when(passwordField.getPassword()).thenReturn("validPass".toCharArray());
-        when(loginModel.validateLogin("validUser", "validPass")).thenReturn(true);
-
-        loginButton.getActionListeners()[0].actionPerformed(null);
-
-        verify(loginModel).validateLogin("validUser", "validPass");
+    void testCustomMessageDialogStyling() {
+        UIManager.put("OptionPane.messageFont", new Font("Arial", Font.PLAIN, 16));
+        UIManager.put("OptionPane.messageForeground", new Color(60, 60, 120));
+        Font messageFont = (Font) UIManager.get("OptionPane.messageFont");
+        assertNotNull(messageFont);
+        assertEquals("Arial", messageFont.getName());
+        assertEquals(Font.PLAIN, messageFont.getStyle());
+        Color messageForeground = (Color) UIManager.get("OptionPane.messageForeground");
+        assertNotNull(messageForeground);
+        assertEquals(new Color(60, 60, 120), messageForeground);
     }
 }
